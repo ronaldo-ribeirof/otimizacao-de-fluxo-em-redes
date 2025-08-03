@@ -47,11 +47,3 @@ Após a execução do programa, você poderá visualizar a capacidade máxima de
 ## Dependências
 
 As bibliotecas necessárias para a execução do projeto estão listadas no arquivo `requirements.txt`. Certifique-se de que todas as dependências estejam instaladas antes de executar o código.
-
-## Contribuições
-
-Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou pull requests para melhorias e correções.
-
-## Licença
-
-Este projeto está licenciado sob a MIT License - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
