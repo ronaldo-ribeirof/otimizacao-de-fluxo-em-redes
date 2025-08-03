@@ -1,63 +1,60 @@
-class Rede:
-    def __init__(self):
-        self.grafo = {}
-    
-    def adicionar_arco(self, origem, destino, capacidade):
-        if origem not in self.grafo:
-            self.grafo[origem] = {}
-        self.grafo[origem][destino] = capacidade
+import networkx as nx
+from collections import deque
 
-def edmonds_karp(rede, fonte, sorvedouro):
-    fila = []
-    pais = {}
-    fluxo_maximo = 0
+def edmonds_karp(G, fonte, sorvedouro):
+    fluxo, _ = nx.maximum_flow(G, fonte, sorvedouro, flow_func=nx.algorithms.flow.edmonds_karp)
+    return fluxo
 
-    while True:
-        fila.append(fonte)
-        pais = {fonte: None}
-        while fila:
-            u = fila.pop(0)
-            for v in rede.grafo.get(u, {}):
-                if v not in pais and rede.grafo[u][v] > 0:
-                    pais[v] = u
-                    if v == sorvedouro:
+def dinic(G, fonte, sorvedouro):
+    # Cria grafo residual
+    residual = nx.DiGraph()
+    for u, v, data in G.edges(data=True):
+        capacidade = data.get('capacity', 0)
+        if capacidade > 0:
+            residual.add_edge(u, v, capacity=capacidade)
+            if not residual.has_edge(v, u):
+                residual.add_edge(v, u, capacity=0)
+
+    def bfs_level():
+        level = {node: -1 for node in residual.nodes}
+        queue = deque([fonte])
+        level[fonte] = 0
+        while queue:
+            u = queue.popleft()
+            for v in residual.successors(u):
+                if residual[u][v]['capacity'] > 0 and level[v] < 0:
+                    level[v] = level[u] + 1
+                    queue.append(v)
+        return level
+
+    def dfs(u, fluxo, level, next_arc):
+        if u == sorvedouro:
+            return fluxo
+        total_sent = 0
+        neighbors = list(residual.successors(u))
+        while next_arc[u] < len(neighbors):
+            v = neighbors[next_arc[u]]
+            if residual[u][v]['capacity'] > 0 and level[v] == level[u] + 1:
+                sent = dfs(v, min(fluxo, residual[u][v]['capacity']), level, next_arc)
+                if sent > 0:
+                    residual[u][v]['capacity'] -= sent
+                    residual[v][u]['capacity'] += sent
+                    total_sent += sent
+                    fluxo -= sent
+                    if fluxo == 0:
                         break
-                    fila.append(v)
-            if sorvedouro in pais:
-                break
-        else:
+            next_arc[u] += 1
+        return total_sent
+
+    fluxo_maximo = 0
+    while True:
+        level = bfs_level()
+        if level[sorvedouro] < 0:
             break
-
-        fluxo = float('Inf')
-        v = sorvedouro
-        while v != fonte:
-            u = pais[v]
-            fluxo = min(fluxo, rede.grafo[u][v])
-            v = u
-
-        v = sorvedouro
-        while v != fonte:
-            u = pais[v]
-            rede.grafo[u][v] -= fluxo
-            if v not in rede.grafo:
-                rede.grafo[v] = {}
-            if u not in rede.grafo[v]:
-                rede.grafo[v][u] = 0
-            rede.grafo[v][u] += fluxo
-            v = u
-
-        fluxo_maximo += fluxo
-
+        next_arc = {node: 0 for node in residual.nodes}
+        while True:
+            sent = dfs(fonte, float('inf'), level, next_arc)
+            if sent == 0:
+                break
+            fluxo_maximo += sent
     return fluxo_maximo
-
-def dinic(rede, fonte, sorvedouro):
-    # Implementação do algoritmo de Dinic
-    pass
-
-def calcular_fluxo_maximo(rede, fonte, sorvedouro, algoritmo='edmonds_karp'):
-    if algoritmo == 'edmonds_karp':
-        return edmonds_karp(rede, fonte, sorvedouro)
-    elif algoritmo == 'dinic':
-        return dinic(rede, fonte, sorvedouro)
-    else:
-        raise ValueError("Algoritmo desconhecido: {}".format(algoritmo))

@@ -1,30 +1,23 @@
+import networkx as nx
+
 def main():
-    # Inicializa a rede de telecomunicações
-    from modelos.rede import Rede
-    from algoritmos.fluxo_maximo import edmonds_karp, dinic
+    # Criação do grafo dirigido
+    G = nx.DiGraph()
+    # Adicionando nós e arcos com capacidade
+    G.add_edge('A', 'B', capacity=10)
+    G.add_edge('A', 'C', capacity=5)
+    G.add_edge('B', 'C', capacity=15)
 
-    # Criação da rede
-    rede = Rede()
-
-    # Adicionando nós e arcos à rede
-    rede.adicionar_no('A')
-    rede.adicionar_no('B')
-    rede.adicionar_no('C')
-    rede.adicionar_arco('A', 'B', 10)
-    rede.adicionar_arco('A', 'C', 5)
-    rede.adicionar_arco('B', 'C', 15)
-
-    # Definindo os nós de origem e destino
     origem = 'A'
     destino = 'C'
 
-    # Calculando o fluxo máximo usando o algoritmo de Edmonds-Karp
-    fluxo_maximo_ek = edmonds_karp(rede, origem, destino)
-    print(f"Fluxo máximo (Edmonds-Karp): {fluxo_maximo_ek}")
+    # Edmonds-Karp (default)
+    fluxo_ek = edmonds_karp(G, origem, destino)
+    print(f"Fluxo máximo (Edmonds-Karp): {fluxo_ek}")
 
-    # Calculando o fluxo máximo usando o algoritmo de Dinic
-    fluxo_maximo_dinic = dinic(rede, origem, destino)
-    print(f"Fluxo máximo (Dinic): {fluxo_maximo_dinic}")
+    # Dinic
+    fluxo_dinic = dinic(G, origem, destino)
+    print(f"Fluxo máximo (Dinic): {fluxo_dinic}")
 
 if __name__ == "__main__":
     main()
