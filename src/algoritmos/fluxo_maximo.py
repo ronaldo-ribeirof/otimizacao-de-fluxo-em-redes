@@ -6,7 +6,6 @@ def edmonds_karp(G, fonte, sorvedouro):
     return fluxo
 
 def dinic(G, fonte, sorvedouro):
-    # Cria grafo residual
     residual = nx.DiGraph()
     for u, v, data in G.edges(data=True):
         capacidade = data.get('capacity', 0)

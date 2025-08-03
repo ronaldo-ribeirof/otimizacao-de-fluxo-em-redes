@@ -12,11 +12,17 @@ class TestFluxoMaximo(unittest.TestCase):
 
     def test_edmonds_karp(self):
         fluxo_maximo = edmonds_karp(self.G, 'A', 'C')
-        self.assertEqual(fluxo_maximo, 15)
+        self.assertEqual(fluxo_maximo, 15, "Edmonds-Karp não retornou o fluxo esperado.")
 
     def test_dinic(self):
         fluxo_maximo = dinic(self.G, 'A', 'C')
-        self.assertEqual(fluxo_maximo, 15)
+        self.assertEqual(fluxo_maximo, 15, "Dinic não retornou o fluxo esperado.")
+
+    def test_fluxo_zero(self):
+        G2 = nx.DiGraph()
+        G2.add_edge('X', 'Y', capacity=0)
+        self.assertEqual(edmonds_karp(G2, 'X', 'Y'), 0, "Fluxo máximo deveria ser zero.")
+        self.assertEqual(dinic(G2, 'X', 'Y'), 0, "Fluxo máximo deveria ser zero.")
 
 if __name__ == '__main__':
     unittest.main()
